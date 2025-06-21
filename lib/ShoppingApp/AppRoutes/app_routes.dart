@@ -6,4 +6,5 @@ class AppRoutes {
   static const String faceDetection = '/face_detection';
   static const String home = '/home';
   static const String forgot = '/forgot';
+  static const String cartScreen = '/cart';
 }

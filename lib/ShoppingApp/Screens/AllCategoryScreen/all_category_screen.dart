@@ -34,10 +34,10 @@ class AllCategoriesWidget extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // Number of columns
-            crossAxisSpacing: 0.8, // Spacing between columns
-            mainAxisSpacing: 0.1, // Spacing between rows
-            childAspectRatio: 1, // Aspect ratio for grid items
+            crossAxisCount: 2,
+            crossAxisSpacing: 0.8,
+            mainAxisSpacing: 0.1,
+            childAspectRatio: 1, 
           ),
           itemCount: snapshot.data!.docs.length,
           itemBuilder: (context, index) {

@@ -47,10 +47,10 @@ class AllProductsScreen extends StatelessWidget {
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Number of columns
-                crossAxisSpacing: 10, // Spacing between columns
-                mainAxisSpacing: 10, // Spacing between rows
-                childAspectRatio: 0.75, // Adjust the aspect ratio of grid items
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.75,
               ),
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {

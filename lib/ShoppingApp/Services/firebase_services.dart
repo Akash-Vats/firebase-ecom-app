@@ -1,4 +1,3 @@
-import 'package:chat_app/Models/user_model.dart';
 import 'package:chat_app/ShoppingApp/Models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

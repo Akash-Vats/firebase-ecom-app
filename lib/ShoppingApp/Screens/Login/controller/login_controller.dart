@@ -1,4 +1,3 @@
-import 'package:chat_app/Models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -82,7 +81,7 @@ class LoginController extends GetxController{
       User? user = userCredential.user;
 
       if (user != null) {
-        
+
         UserModel1 userModel=UserModel1(uid: user.uid, userName: user.displayName.toString(),
           phone: user.phoneNumber.toString(), userImg:user.photoURL.toString(),
           userDeviceToken: '', country: '', email: '', userAddress: '', street: '', isAdmin: false, isActive: true, userCity: '',);
