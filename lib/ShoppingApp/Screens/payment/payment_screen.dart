@@ -1,3 +1,4 @@
+import 'package:chat_app/ShoppingApp/Common/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../Models/cart_model.dart';
@@ -25,7 +26,7 @@ class PaymentScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Payment'),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor:AppColors.primary,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -59,11 +60,12 @@ class PaymentScreen extends StatelessWidget {
                 onPressed: controller.isPlacingOrder.value
                     ? null
                     : () async {
-                  await controller.confirmOrder(
+                    controller.confirmOrder(
                     userName: userName,
                     phoneNumber: phoneNumber,
                     address: address,
                   );
+
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,

@@ -37,7 +37,7 @@ class LoginController extends GetxController{
       if(user!=null){
         if(user.emailVerified){
           print(" login succesfull${user.email}");
-          Get.offAllNamed(AppRoutes.home);
+          Get.offAllNamed(AppRoutes.dashboard);
           CommonSnackbar.showSuccess(title: 'Success', message: 'Login Successfully');
         }
         else{
@@ -86,7 +86,7 @@ class LoginController extends GetxController{
           phone: user.phoneNumber.toString(), userImg:user.photoURL.toString(),
           userDeviceToken: '', country: '', email: '', userAddress: '', street: '', isAdmin: false, isActive: true, userCity: '',);
         FirebaseFirestore.instance.collection("userss").doc(user.uid).set(userModel.toMap() );
-        Get.offAllNamed(AppRoutes.home);
+        Get.offAllNamed(AppRoutes.dashboard);
       }
     } catch (error) {
       Get.snackbar('Error', error.toString());

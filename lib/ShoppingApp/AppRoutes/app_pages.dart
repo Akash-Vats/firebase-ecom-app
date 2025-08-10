@@ -1,6 +1,7 @@
 import 'package:chat_app/ShoppingApp/Screens/Forgotpassword/bindings/forgot_password_binding.dart';
 import 'package:chat_app/ShoppingApp/Screens/Forgotpassword/forgotpassword_screen.dart';
 import 'package:chat_app/ShoppingApp/Screens/cartscreen/cart_screen.dart';
+import 'package:chat_app/ShoppingApp/Screens/dashboard/dashboard_screen.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import '../Screens/Login/bindings/login_binding.dart';
 import '../Screens/Login/login_screen.dart';
@@ -58,6 +59,13 @@ class AppPages {
       name: AppRoutes.forgot,
       page: () =>  ForgotPasswordScreen(),
       binding: ForgotPasswordBinding()
+
+
+    ),
+    GetPage(
+      name: AppRoutes.dashboard,
+      page: () =>  const DashboardScreen(),
+
 
 
     ),

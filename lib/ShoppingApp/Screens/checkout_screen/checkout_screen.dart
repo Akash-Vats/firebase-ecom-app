@@ -1,3 +1,4 @@
+import 'package:chat_app/ShoppingApp/Common/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,7 +18,7 @@ class CheckoutScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Checkout"),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
