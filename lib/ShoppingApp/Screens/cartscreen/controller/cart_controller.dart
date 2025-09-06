@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../Common/app_colors.dart';
 import '../../../Models/cart_model.dart';
 
 class CartController extends GetxController {
@@ -10,6 +12,9 @@ class CartController extends GetxController {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   double get totalPrice =>
+      cartItems.fold(0.0, (sum, item) => sum + item.productTotalPrice);
+  
+  double get subtotalPrice =>
       cartItems.fold(0.0, (sum, item) => sum + item.productTotalPrice);
 
   @override
@@ -46,29 +51,64 @@ class CartController extends GetxController {
       'productTotalPrice': newTotal,
       'updatedAt': DateTime.now(),
     });
-
   }
 
   Future<void> deleteItem(CartModel item) async {
-    await firestore
-        .collection('cart')
-        .doc(uid)
-        .collection('cartOrders')
-        .doc(item.productId)
-        .delete();
+    try {
+      await firestore
+          .collection('cart')
+          .doc(uid)
+          .collection('cartOrders')
+          .doc(item.productId)
+          .delete();
 
-    Get.snackbar('Removed', '${item.productName} removed from cart');
+      Get.snackbar(
+        'Item Removed',
+        '${item.productName} has been removed from your cart',
+        backgroundColor: AppColors.success,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to remove item from cart. Please try again.',
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+    }
   }
 
   Future<void> clearCart() async {
-    final cartRef = firestore
-        .collection('cart')
-        .doc(uid)
-        .collection('cartOrders');
+    try {
+      final cartRef = firestore
+          .collection('cart')
+          .doc(uid)
+          .collection('cartOrders');
 
-    final snapshot = await cartRef.get();
-    for (var doc in snapshot.docs) {
-      await doc.reference.delete();
+      final snapshot = await cartRef.get();
+      for (var doc in snapshot.docs) {
+        await doc.reference.delete();
+      }
+      
+      Get.snackbar(
+        'Cart Cleared',
+        'All items have been removed from your cart',
+        backgroundColor: AppColors.success,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to clear cart. Please try again.',
+        backgroundColor: AppColors.error,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
     }
   }
 }

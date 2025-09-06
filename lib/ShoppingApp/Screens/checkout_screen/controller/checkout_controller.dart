@@ -22,6 +22,9 @@ class CheckoutController extends GetxController {
 
   double get totalPrice =>
       cartItems.fold(0.0, (sum, item) => sum + item.productTotalPrice);
+  
+  double get subtotalPrice =>
+      cartItems.fold(0.0, (sum, item) => sum + item.productTotalPrice);
 
   @override
   void onInit() {
@@ -92,7 +95,7 @@ class CheckoutController extends GetxController {
       'deliveryAddress': address,
     });
 
-    final CartController cartController = Get.find();
+    final CartController cartController = Get.put(CartController());
     await cartController.clearCart();
 
     isPlacingOrder.value = false;

@@ -28,24 +28,68 @@ class SignUpController extends GetxController{
   }
 
   Future<void> signup() async {
+    if (userNameController.text.trim().isEmpty) {
+      CommonSnackbar.showError(title: 'Error', message: 'Please enter your full name');
+      return;
+    }
+    if (emailController.text.trim().isEmpty) {
+      CommonSnackbar.showError(title: 'Error', message: 'Please enter your email address');
+      return;
+    }
+    if (phoneController.text.trim().isEmpty) {
+      CommonSnackbar.showError(title: 'Error', message: 'Please enter your phone number');
+      return;
+    }
+    if (userCityController.text.trim().isEmpty) {
+      CommonSnackbar.showError(title: 'Error', message: 'Please enter your city');
+      return;
+    }
+    if (passController.text.trim().isEmpty) {
+      CommonSnackbar.showError(title: 'Error', message: 'Please enter your password');
+      return;
+    }
+    if (passController.text.length < 6) {
+      CommonSnackbar.showError(title: 'Error', message: 'Password must be at least 6 characters long');
+      return;
+    }
+
     isLoading.value = true;
 
     try {
-      User? user= await FirebaseServices().registerWithEmail(emailController.text, passController.text,userNameController.text,phoneController.text,userCityController.text);
-      if(user!=null){
+      User? user = await FirebaseServices().registerWithEmail(
+        emailController.text,
+        passController.text,
+        userNameController.text,
+        phoneController.text,
+        userCityController.text,
+      );
+      
+      if (user != null) {
         print("Registration successful: ${user.email}");
+        CommonSnackbar.showSuccess(
+          title: 'Registration Successful!', 
+          message: 'Account created successfully. Please verify your email before logging in.'
+        );
         Get.offAllNamed(AppRoutes.login);
-        CommonSnackbar.showSuccess(title: 'Success', message: 'Register Successfully');
       }
-
     } catch (e) {
-
-      CommonSnackbar.showError(title: 'Failed', message: e.toString());
-
-
+      String errorMessage = 'Registration failed. Please try again.';
+      if (e.toString().contains('email-already-in-use')) {
+        errorMessage = 'An account with this email already exists. Please use a different email or try logging in.';
+      } else if (e.toString().contains('weak-password')) {
+        errorMessage = 'Password is too weak. Please choose a stronger password.';
+      } else if (e.toString().contains('invalid-email')) {
+        errorMessage = 'Please enter a valid email address.';
+      } else if (e.toString().contains('operation-not-allowed')) {
+        errorMessage = 'Email registration is currently disabled. Please contact support.';
+      }
+      CommonSnackbar.showError(title: 'Registration Failed', message: errorMessage);
     } finally {
       isLoading.value = false;
+      userNameController.clear();
       emailController.clear();
+      phoneController.clear();
+      userCityController.clear();
       passController.clear();
     }
   }

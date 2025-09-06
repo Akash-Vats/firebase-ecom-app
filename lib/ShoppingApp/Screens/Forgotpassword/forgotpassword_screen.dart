@@ -11,7 +11,7 @@ import '../../Common/app_colors.dart';
 class ForgotPasswordScreen extends StatelessWidget {
   ForgotPasswordScreen({super.key});
   final ForgotPasswordController forgotController =
-      Get.find<ForgotPasswordController>();
+      Get.put(ForgotPasswordController());
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();

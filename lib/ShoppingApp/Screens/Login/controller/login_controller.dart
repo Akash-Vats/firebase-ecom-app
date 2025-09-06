@@ -30,26 +30,40 @@ class LoginController extends GetxController{
   }
 
   Future<void> login() async {
+    if (emailController.text.trim().isEmpty) {
+      CommonSnackbar.showError(title: 'Error', message: 'Please enter your email');
+      return;
+    }
+    if (passController.text.trim().isEmpty) {
+      CommonSnackbar.showError(title: 'Error', message: 'Please enter your password');
+      return;
+    }
+
     isLoading.value = true;
 
     try {
-      User? user= await FirebaseServices().signInWithEmail(emailController.text, passController.text);
-      if(user!=null){
-        if(user.emailVerified){
-          print(" login succesfull${user.email}");
+      User? user = await FirebaseServices().signInWithEmail(emailController.text, passController.text);
+      if (user != null) {
+        if (user.emailVerified) {
+          print("Login successful: ${user.email}");
           Get.offAllNamed(AppRoutes.dashboard);
-          CommonSnackbar.showSuccess(title: 'Success', message: 'Login Successfully');
+          CommonSnackbar.showSuccess(title: 'Success', message: 'Login successful! Welcome back!');
+        } else {
+          CommonSnackbar.showError(title: 'Email Verification Required', message: 'Please verify your email before logging in');
         }
-        else{
-          CommonSnackbar.showError(title: 'Error', message: 'Please verify your email first');
-        }
-
       }
     } catch (e) {
-
-      CommonSnackbar.showError(title: 'Error', message: e.toString());
-
-
+      String errorMessage = 'Login failed. Please try again.';
+      if (e.toString().contains('user-not-found')) {
+        errorMessage = 'No account found with this email address';
+      } else if (e.toString().contains('wrong-password')) {
+        errorMessage = 'Incorrect password. Please try again';
+      } else if (e.toString().contains('invalid-email')) {
+        errorMessage = 'Please enter a valid email address';
+      } else if (e.toString().contains('too-many-requests')) {
+        errorMessage = 'Too many failed attempts. Please try again later';
+      }
+      CommonSnackbar.showError(title: 'Login Failed', message: errorMessage);
     } finally {
       isLoading.value = false;
       emailController.clear();
@@ -62,12 +76,10 @@ class LoginController extends GetxController{
     try {
       loading.value = true;
 
-
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        Get.snackbar('Sign In Cancelled', 'User cancelled the sign-in');
+        CommonSnackbar.showError(title: 'Sign In Cancelled', message: 'Google sign-in was cancelled');
         loading.value = false;
-
         return;
       }
 
@@ -81,15 +93,37 @@ class LoginController extends GetxController{
       User? user = userCredential.user;
 
       if (user != null) {
-
-        UserModel1 userModel=UserModel1(uid: user.uid, userName: user.displayName.toString(),
-          phone: user.phoneNumber.toString(), userImg:user.photoURL.toString(),
-          userDeviceToken: '', country: '', email: '', userAddress: '', street: '', isAdmin: false, isActive: true, userCity: '',);
-        FirebaseFirestore.instance.collection("userss").doc(user.uid).set(userModel.toMap() );
+        UserModel1 userModel = UserModel1(
+          uid: user.uid,
+          userName: user.displayName ?? 'User',
+          phone: user.phoneNumber ?? '',
+          userImg: user.photoURL ?? '',
+          userDeviceToken: '',
+          country: '',
+          email: user.email ?? '',
+          userAddress: '',
+          street: '',
+          isAdmin: false,
+          isActive: true,
+          userCity: '',
+        );
+        
+        await FirebaseFirestore.instance
+            .collection("userss")
+            .doc(user.uid)
+            .set(userModel.toMap());
+            
+        CommonSnackbar.showSuccess(title: 'Success', message: 'Signed in with Google successfully!');
         Get.offAllNamed(AppRoutes.dashboard);
       }
     } catch (error) {
-      Get.snackbar('Error', error.toString());
+      String errorMessage = 'Google sign-in failed. Please try again.';
+      if (error.toString().contains('network_error')) {
+        errorMessage = 'Network error. Please check your internet connection';
+      } else if (error.toString().contains('sign_in_failed')) {
+        errorMessage = 'Google sign-in failed. Please try again';
+      }
+      CommonSnackbar.showError(title: 'Google Sign-In Failed', message: errorMessage);
     } finally {
       loading.value = false;
       update();
