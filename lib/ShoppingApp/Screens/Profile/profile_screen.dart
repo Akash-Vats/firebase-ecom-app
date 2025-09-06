@@ -123,10 +123,209 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _pickImage() async {
+  void _showImageSourceBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.r),
+            topRight: Radius.circular(20.r),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle Bar
+            Container(
+              margin: EdgeInsets.only(top: 12.h),
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+            
+            SizedBox(height: 20.h),
+            
+            // Title
+            Text(
+              'Select Photo',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            
+            SizedBox(height: 24.h),
+            
+            // Options
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Column(
+                children: [
+                  // Camera Option
+                  _buildImageSourceOption(
+                    icon: Icons.camera_alt,
+                    title: 'Take Photo',
+                    subtitle: 'Use camera to take a new photo',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImage(ImageSource.camera);
+                    },
+                  ),
+                  
+                  SizedBox(height: 16.h),
+                  
+                  // Gallery Option
+                  _buildImageSourceOption(
+                    icon: Icons.photo_library,
+                    title: 'Choose from Gallery',
+                    subtitle: 'Select photo from your gallery',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImage(ImageSource.gallery);
+                    },
+                  ),
+                  
+                  SizedBox(height: 16.h),
+                  
+                  // Remove Photo Option (if image exists)
+                  if (_selectedImagePath != null || (_userModel?.userImg != null && _userModel!.userImg.isNotEmpty))
+                    _buildImageSourceOption(
+                      icon: Icons.delete_outline,
+                      title: 'Remove Photo',
+                      subtitle: 'Remove current profile photo',
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _selectedImagePath = null;
+                        });
+                        Get.snackbar(
+                          'Success',
+                          'Profile photo removed',
+                          backgroundColor: AppColors.success,
+                          colorText: Colors.white,
+                        );
+                      },
+                      isDestructive: true,
+                    ),
+                ],
+              ),
+            ),
+            
+            SizedBox(height: 24.h),
+            
+            // Cancel Button
+            Container(
+              width: double.infinity,
+              margin: EdgeInsets.symmetric(horizontal: 24.w),
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    side: BorderSide(color: AppColors.border),
+                  ),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            
+            SizedBox(height: 24.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageSourceOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: AppColors.border,
+            width: 1.w,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48.w,
+              height: 48.w,
+              decoration: BoxDecoration(
+                color: isDestructive 
+                    ? AppColors.error.withOpacity(0.1)
+                    : AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(24.r),
+              ),
+              child: Icon(
+                icon,
+                color: isDestructive ? AppColors.error : AppColors.primary,
+                size: 24.sp,
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: isDestructive ? AppColors.error : AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16.sp,
+              color: AppColors.textTertiary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         maxWidth: 512,
         maxHeight: 512,
         imageQuality: 80,
@@ -136,6 +335,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           _selectedImagePath = image.path;
         });
+        
+        // Show success message
+        Get.snackbar(
+          'Success',
+          'Photo selected successfully',
+          backgroundColor: AppColors.success,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to pick image: $e');
@@ -260,7 +467,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       // Profile Image
                       GestureDetector(
-                        onTap: _pickImage,
+                        onTap: _showImageSourceBottomSheet,
                         child: Stack(
                           children: [
                             Container(
